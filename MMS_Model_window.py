@@ -1,14 +1,16 @@
 import tkinter as tk
 from tkinter import ttk
-import MM1_Model as MM1
+import screen_config
+import MMS_Model as MMS
 
-class Window(tk.Toplevel):
+class ResultsWindow(tk.Toplevel):
     averageQueueLengthResult: float
+
     def __init__(self, parent, averageQueueLengthResult):
         super().__init__(parent)
         self.averageQueueLengthResult = averageQueueLengthResult
-        setWindowInCenterOfScreen(self)
-        self.title("RESULTADOS - MODELO M/M/1")
+        screen_config.setWindowInCenterOfScreen(self)
+        self.title("RESULTADOS - MODELO M/M/S>1")
         ttk.Label(
             self, 
             text="RESULTADOS", 
@@ -17,9 +19,9 @@ class Window(tk.Toplevel):
             width=100,
             justify="center"
             ).pack(expand=True)
-        averageTailLength = ttk.Label(self, font=("Courier", 10))
-        averageTailLength.pack(expand=True)
-        averageTailLength.config(text=f"Longitud promedio de la cola: {averageQueueLengthResult}")
+        averageQueueLengthLabel = ttk.Label(self, font=("Courier", 10))
+        averageQueueLengthLabel.pack(expand=True)
+        averageQueueLengthLabel.config(text=f"Longitud promedio de la cola: {averageQueueLengthResult}")
         tk.Button(
             self, 
             text="OK", 
@@ -28,11 +30,11 @@ class Window(tk.Toplevel):
             activebackground="dodger blue"
             ).pack(expand=True)
 
-class App(tk.Tk):
+class MMSModelApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        setWindowInCenterOfScreen(self)
-        self.title("TEORÍA DE COLAS - M/M/1")
+        screen_config.setWindowInCenterOfScreen(self)
+        self.title("TEORÍA DE COLAS - MODELO CASO 2 - M/M/S>1")
         tk.Label(self, text="Ingresa Lambda (λ) :", font=("Courier", 10)).pack(expand=True)
         lambdaEntry = ttk.Entry(self, justify="center")
         lambdaEntry.focus()
@@ -40,16 +42,20 @@ class App(tk.Tk):
         tk.Label(self, text="Ingresa Mi (µ) :", font=("Courier", 10)).pack(expand=True)
         miEntry = ttk.Entry(self, justify="center")
         miEntry.pack(expand=True)
+        tk.Label(self, text="Ingresa el número de servidores (s) :", font=("Courier", 10)).pack(expand=True)
+        serversEntry = ttk.Entry(self, justify="center")
+        serversEntry.pack(expand=True)
 
         def open_results():
-            if lambdaEntry.get() == "" or miEntry.get() == "":
+            if lambdaEntry.get() == "" or miEntry.get() == "" or serversEntry.get() == "":
                 pass
             else:
-                model = MM1.MM1(float(lambdaEntry.get()), float(miEntry.get()))
+                model = MMS.MMS(float(lambdaEntry.get()), float(miEntry.get()), int(serversEntry.get()))
                 averageQueueLength = round(model.averageQueueLength(0), 4)
                 lambdaEntry.delete(0, "end")
                 miEntry.delete(0, "end")
-                window = Window(self, averageQueueLength)
+                serversEntry.delete(0, "end")
+                window = ResultsWindow(self, averageQueueLength)
                 window.grab_set()
         
         tk.Button(
@@ -60,15 +66,6 @@ class App(tk.Tk):
             activebackground="light sky blue"
             ).pack(expand=True)
 
-def setWindowInCenterOfScreen(window):
-    screenWidth = window.winfo_screenwidth()
-    screenHeight = window.winfo_screenheight()
-    windowWidth = 500
-    windowHeight = 300
-    positionWidth = round(screenWidth / 2 - windowWidth / 2)
-    positionHeight = round(screenHeight / 2 - windowHeight / 2)
-    window.geometry(str(windowWidth)+"x"+str(windowHeight)+"+"+str(positionWidth)+"+"+str(positionHeight))
-
-if __name__ == "__main__":
-    app = App()
+def initialize():
+    app = MMSModelApp()
     app.mainloop()

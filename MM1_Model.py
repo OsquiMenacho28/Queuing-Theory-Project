@@ -15,7 +15,7 @@ class MM1:
             Lq = self.lambdaVariable * Wq
         else:
             Lq = (self.lambdaVariable**2) / (self.miVariable * (self.miVariable - self.lambdaVariable))
-        return Lq
+        return round(Lq, 4)
 
     def averageWaitingTimeInQueue(self, lq):
         if lq > 0:
