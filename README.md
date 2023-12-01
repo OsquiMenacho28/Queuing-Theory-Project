@@ -27,7 +27,7 @@ This Python project implements queuing theory with a graphical user interface (G
 2. Run the application:
 
    ```bash
-   python main_MM1_Model.py
+   python main_window.py
    ```
 
 ## Usage
