@@ -1,8 +1,8 @@
 import math
 
 class MMS:
-    lambdaVariable: float
-    miVariable: float
+    lambdaVariable: int
+    miVariable: int
     servers: int
 
     def __init__(self, lambdaVariable, miVariable, servers):
@@ -17,12 +17,12 @@ class MMS:
         while (i <= self.servers):
             factorial = factorial * i
             i = i + 1
-        Lq = (Po * ((self.lambdaVariable / self.miVariable) ** self.servers)) / (factorial * ((1 - p) ** 2))
-        return round(Lq, 4)
+        Lq = (Po * ((self.lambdaVariable / self.miVariable) ** self.servers) * p) / (factorial * ((1 - p) ** 2))
+        return Lq
 
     def averageWaitingTimeInQueue(self, lq):
         Wq = lq / self.lambdaVariable
-        return round(Wq, 4)
+        return Wq
     
     # SYSTEM FUNCTIONS
     def averageSystemLength(self, Lq, Wq):
@@ -30,13 +30,13 @@ class MMS:
             Ls = Lq + (self.lambdaVariable / self.miVariable)
         else:
             Ls = self.lambdaVariable * (Wq + (1 / self.miVariable))
-        return round(Ls, 4)
+        return Ls
 
     def averageWaitingTimeInSystem(self, Lq, Wq, p, Po):
-        i = 0
         if Lq > 0:
             Ws = (Lq / self.lambdaVariable) + (1 / self.miVariable)
         elif Po > 0:
+            i = 1
             factorial = 1
             while (i <= self.servers):
                 factorial = factorial * i
@@ -44,34 +44,32 @@ class MMS:
             Ws = ((Po * ((self.lambdaVariable / self.miVariable) ** self.servers) * p) / (factorial * ((1 - p) ** 2) * self.lambdaVariable)) + (1 / self.miVariable)
         elif Wq > 0:
             Ws = Wq + (1 / self.miVariable)
-        else:
-            Ws = 1 / (self.miVariable - self.lambdaVariable)
-        return round(Ws, 4)
+        return Ws
     
     # Utilization factor
     def utilizationFactor(self):
         p = self.lambdaVariable / (self.servers * self.miVariable)
-        return round(p, 4)
+        return p
     
     # Probability that there are 0 clients in the System
     def probabilityThatThereAreNoClientsInSystem(self):
-        factorial = 1
         i = 1
+        factorial = 1
         while (i <= self.servers):
             factorial = factorial * i
             i = i + 1
         n = 0
         sumatoria = 0
         while n <= (self.servers - 1):
-            factorial2 = 1
             t = 1
+            factorial2 = 1
             while (t <= n):
                 factorial2 = factorial2 * t
                 t = t + 1
-            sumatoria = ((self.lambdaVariable / self.miVariable) ** n) / factorial2
+            sumatoria = sumatoria + ((self.lambdaVariable / self.miVariable) ** n) / factorial2
             n += 1
         Po = 1 / (sumatoria + ((((self.lambdaVariable / self.miVariable) ** self.servers) / factorial) * (1 / (1 - (self.lambdaVariable / (self.servers * self.miVariable))))))
-        return round(Po, 4)
+        return Po
     
     # Probability that there are N clients in a busy System
     def probabilityThatThereAreNClientsInABusySystem(self, n, Po):
@@ -81,13 +79,14 @@ class MMS:
             factorial = factorial * i
             i = i + 1
         factorial2 = 1
-        j = 1
-        while (j <= self.servers):
-            factorial2 = factorial2 * j
-            j = j + 1
+        g = 1
+        while (g <= self.servers):
+            factorial2 = factorial2 * g
+            g = g + 1
         if (0 <= n <= self.servers):
             Pn = (((self.lambdaVariable / self.miVariable) ** n) / factorial) * Po
+            return Pn
         else:
             if (n >= self.servers):
                 Pn = (((self.lambdaVariable / self.miVariable) ** n) / (factorial2 * ((self.servers) ** (n - self.servers)))) * Po
-        return round(Pn, 4)
+                return Pn

@@ -10,9 +10,10 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         screen_config.setWindowInCenterOfScreen(self, 450, 300)
+        self.config(background="light cyan")
         self.title("TEORÍA DE COLAS")
         tk.Label(self, text="TEORÍA DE COLAS", font=("Courier", 15), background="light sky blue").pack(expand=True)
-        tk.Label(self, text="Selecciona un Modelo :", font=("Courier", 10)).pack(expand=True)
+        tk.Label(self, text="Selecciona un Modelo :", font=("Courier", 10), background="aquamarine").pack(expand=True)
         tk.Button(
             self,
             text="MODELO CASO 1 - M/M/1",

@@ -34,13 +34,13 @@ class ResultsWindow(tk.Toplevel):
             font=("Courier", 20), 
             justify="center"
             ).pack(expand=True)
-        setResult(self, f"Factor de utilización: {utilizationFactorResult * 100}%")
-        setResult(self, f"Probabilidad de que hayan 0 clientes en el sistema: {probabilityThatThereAreNoClientsInSystemResult * 100}%")
-        setResult(self, f"Longitud promedio de la cola: {averageQueueLengthResult} clientes.")
-        setResult(self, f"Tiempo promedio de espera en la cola: {averageWaitingTimeInQueueResult * 60} minutos.")
-        setResult(self, f"Longitud promedio del sistema: {averageSystemLengthResult} clientes.")
-        setResult(self, f"Tiempo promedio de espera en el sistema: {averageWaitingTimeInSystemResult * 60} minutos.")
-        setResult(self, f"Probabilidad de que hayan N clientes en el sistema: {probabilityThatThereAreNClientsInABusySystemResult * 100}%")
+        setResult(self, f"Factor de utilización (p): {round(utilizationFactorResult * 100, 2)}%")
+        setResult(self, f"Probabilidad de que hayan 0 clientes en el sistema (Po): {round(probabilityThatThereAreNoClientsInSystemResult * 100, 2)}%")
+        setResult(self, f"Longitud promedio de la cola (Lq): {round(averageQueueLengthResult, 2)} clientes.")
+        setResult(self, f"Tiempo promedio de espera en la cola (Wq): {round(averageWaitingTimeInQueueResult, 4)} horas.")
+        setResult(self, f"Longitud promedio del sistema (Ls): {round(averageSystemLengthResult, 2)} clientes.")
+        setResult(self, f"Tiempo promedio de espera en el sistema (Ws): {round(averageWaitingTimeInSystemResult, 4)} horas.")
+        setResult(self, f"Probabilidad de que hayan N clientes en el sistema (Pn): {round(probabilityThatThereAreNClientsInABusySystemResult * 100, 2)}%")
         tk.Button(
             self, 
             text="OK", 
@@ -76,7 +76,7 @@ class MMSModelApp(tk.Tk):
             if lambdaEntry.get() == "" or miEntry.get() == "" or nServers.get() == "":
                 pass
             else:
-                model = MMS.MMS(float(lambdaEntry.get()), float(miEntry.get()), int(nServers.get()))
+                model = MMS.MMS(int(lambdaEntry.get()), int(miEntry.get()), int(nServers.get()))
                 utilizationFactor = model.utilizationFactor()
                 probabilityThatThereAreNoClientsInSystem = model.probabilityThatThereAreNoClientsInSystem()
                 averageQueueLength = model.averageQueueLength(probabilityThatThereAreNoClientsInSystem, utilizationFactor)

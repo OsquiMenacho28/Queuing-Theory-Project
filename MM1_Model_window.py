@@ -16,12 +16,13 @@ class ResultsWindow(tk.Toplevel):
     timeBetweenServicesResult: float
     probabilityThatWaitingTimeIsGreaterThanATimeInSystemResult: float
     probabilityThatWaitingTimeIsGreaterThanATimeInQueueResult: float
+    probabilityThatExistsMoreThanNClientsInQueueResult: float
 
     def __init__(self, parent, utilizationFactorResult, averageQueueLengthResult, averageWaitingTimeInQueueResult, 
                  averageSystemLengthResult, averageWaitingTimeInSystemResult, systemWaitingTimeProbabilityResult,
                  probabilityThatThereAreNoClientsInSystemResult, probabilityThatThereAreNClientsInABusySystemResult,
                  timeBetweenArrivalsResult, timeBetweenServicesResult, probabilityThatWaitingTimeIsGreaterThanATimeInSystemResult, 
-                 probabilityThatWaitingTimeIsGreaterThanATimeInQueueResult):
+                 probabilityThatWaitingTimeIsGreaterThanATimeInQueueResult, probabilityThatExistsMoreThanNClientsInQueueResult):
         super().__init__(parent)
 
         self.utilizationFactorResult = utilizationFactorResult
@@ -36,6 +37,7 @@ class ResultsWindow(tk.Toplevel):
         self.timeBetweenServicesResult = timeBetweenServicesResult
         self.probabilityThatWaitingTimeIsGreaterThanATimeInSystemResult = probabilityThatWaitingTimeIsGreaterThanATimeInSystemResult
         self.probabilityThatWaitingTimeIsGreaterThanATimeInQueueResult = probabilityThatWaitingTimeIsGreaterThanATimeInQueueResult
+        self.probabilityThatExistsMoreThanNClientsInQueueResult = probabilityThatExistsMoreThanNClientsInQueueResult
 
         screen_config.setWindowInCenterOfScreen(self, 1000, 650)
         self.title("RESULTADOS")
@@ -46,18 +48,19 @@ class ResultsWindow(tk.Toplevel):
             font=("Courier", 20), 
             justify="center"
             ).pack(expand=True)
-        setResult(self, f"Factor de utilización: {utilizationFactorResult * 100}%")
-        setResult(self, f"Longitud promedio de la cola: {averageQueueLengthResult} clientes.")
-        setResult(self, f"Tiempo promedio de espera en la cola: {averageWaitingTimeInQueueResult * 60} minutos.")
-        setResult(self, f"Longitud promedio del sistema: {averageSystemLengthResult} clientes.")
-        setResult(self, f"Tiempo promedio de espera en el sistema: {averageWaitingTimeInSystemResult * 60} minutos.")
-        setResult(self, f"Probabilidad de tiempo de espera en el sistema: {systemWaitingTimeProbabilityResult * 100}%")
-        setResult(self, f"Probabilidad de que hayan 0 clientes en el sistema: {probabilityThatThereAreNoClientsInSystemResult * 100}%")
-        setResult(self, f"Probabilidad de que hayan N clientes en el sistema: {probabilityThatThereAreNClientsInABusySystemResult * 100}%")
-        setResult(self, f"Tiempo entre llegadas: {timeBetweenArrivalsResult * 60} minutos.")
-        setResult(self, f"Tiempo entre servicios: {timeBetweenServicesResult * 60} minutos.")
-        setResult(self, f"Probabilidad de que el tiempo de espera en el sistema sea mayor a un tiempo determinado: {probabilityThatWaitingTimeIsGreaterThanATimeInSystemResult * 100}%")
-        setResult(self, f"Probabilidad de que el tiempo de espera en la cola sea mayor a un tiempo determinado: {probabilityThatWaitingTimeIsGreaterThanATimeInQueueResult * 100}%")
+        setResult(self, f"Factor de utilización (p): {round(utilizationFactorResult * 100, 2)}%")
+        setResult(self, f"Longitud promedio de la cola (Lq): {round(averageQueueLengthResult, 2)} clientes.")
+        setResult(self, f"Tiempo promedio de espera en la cola (Wq): {round(averageWaitingTimeInQueueResult, 4)} horas.")
+        setResult(self, f"Longitud promedio del sistema (Ls): {round(averageSystemLengthResult, 2)} clientes.")
+        setResult(self, f"Tiempo promedio de espera en el sistema (Ws): {round(averageWaitingTimeInSystemResult, 4)} horas.")
+        setResult(self, f"Probabilidad de tiempo de espera en el sistema P(Ws): {round(systemWaitingTimeProbabilityResult * 100, 2)}%")
+        setResult(self, f"Probabilidad de que hayan 0 clientes en el sistema (Po): {round(probabilityThatThereAreNoClientsInSystemResult * 100, 2)}%")
+        setResult(self, f"Probabilidad de que hayan N clientes en el sistema (Pn): {round(probabilityThatThereAreNClientsInABusySystemResult * 100, 2)}%")
+        setResult(self, f"Tiempo esperado entre llegadas (1/λ): {round(timeBetweenArrivalsResult, 4)} horas.")
+        setResult(self, f"Tiempo esperado entre servicios (1/µ): {round(timeBetweenServicesResult, 4)} horas.")
+        setResult(self, f"Probabilidad de que el tiempo de espera en el sistema sea mayor a un tiempo determinado P(Ws > t): {round(probabilityThatWaitingTimeIsGreaterThanATimeInSystemResult * 100, 2)}%")
+        setResult(self, f"Probabilidad de que el tiempo de espera en la cola sea mayor a un tiempo determinado P(Wq > t): {round(probabilityThatWaitingTimeIsGreaterThanATimeInQueueResult * 100, 2)}%")
+        setResult(self, f"Probabilidad de que existan más de N clientes en la cola P(Lq > n): {round(probabilityThatExistsMoreThanNClientsInQueueResult * 100, 2)}%")
         tk.Button(
             self, 
             text="OK", 
@@ -93,7 +96,7 @@ class MM1ModelApp(tk.Tk):
             if lambdaEntry.get() == "" or miEntry.get() == "":
                 pass
             else:
-                model = MM1.MM1(float(lambdaEntry.get()), float(miEntry.get()))
+                model = MM1.MM1(int(lambdaEntry.get()), int(miEntry.get()))
                 utilizationFactor = model.utilizationFactor()
                 averageQueueLength = model.averageQueueLength(0)
                 averageWaitingTimeInQueue = model.averageWaitingTimeInQueue(averageQueueLength)
@@ -103,8 +106,10 @@ class MM1ModelApp(tk.Tk):
                 probabilityThatThereAreNoClientsInSystem = model.probabilityThatThereAreNoClientsInSystem(utilizationFactor)
                 if nClients.get() == "":
                     probabilityThatThereAreNClientsInABusySystem = model.probabilityThatThereAreNClientsInABusySystem(utilizationFactor, 0, probabilityThatThereAreNoClientsInSystem)
+                    probabilityThatExistsMoreThanNClientsInQueue = model.probabilityThatExistsMoreThanNClientsInQueue(1, utilizationFactor)
                 else:
                     probabilityThatThereAreNClientsInABusySystem = model.probabilityThatThereAreNClientsInABusySystem(utilizationFactor, int(nClients.get()), probabilityThatThereAreNoClientsInSystem)
+                    probabilityThatExistsMoreThanNClientsInQueue = model.probabilityThatExistsMoreThanNClientsInQueue(int(nClients.get()) + 1, utilizationFactor)
                 timeBetweenArrivals = model.timeBetweenArrivals()
                 timeBetweenServices = model.timeBetweenServices()
                 if waitTime.get() == "":
@@ -130,7 +135,8 @@ class MM1ModelApp(tk.Tk):
                     timeBetweenArrivals,
                     timeBetweenServices,
                     probabilityThatWaitingTimeIsGreaterThanATimeInSystem,
-                    probabilityThatWaitingTimeIsGreaterThanATimeInQueue
+                    probabilityThatWaitingTimeIsGreaterThanATimeInQueue,
+                    probabilityThatExistsMoreThanNClientsInQueue
                     )
                 window.grab_set()
         
